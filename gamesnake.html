@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Snake II Nokia Klasik</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #2c3e50, #4ca1af);
+      margin: 0;
+      font-family: 'Press Start 2P', cursive;
+      overflow: hidden;
+      flex-direction: column;
+    }
+
+    #login-form {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      text-align: center;
+      animation: fadeIn 1s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #login-form input {
+      padding: 10px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.5em;
+      width: 220px;
+      text-align: center;
+      border: none;
+      border-radius: 5px;
+      margin-top: 15px;
+      background: #f0f0f0;
+    }
+
+    #login-form button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.5em;
+      cursor: pointer;
+      background: #3498db;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      transition: background 0.3s ease;
+    }
+
+    #login-form button:hover {
+      background: #2980b9;
+    }
+
+    #nokia-phone {
+      display: none;
+      width: 350px;
+      height: 600px;
+      background-color: #a0a0a0;
+      border-radius: 30px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+      border: 5px solid #888;
+    }
+
+    #screen-bezel {
+      width: 100%;
+      height: 280px;
+      background-color: #555;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 3px solid #444;
+      margin-bottom: 20px;
+    }
+
+    #game-screen {
+      width: 280px;
+      height: 200px;
+      background-color: #c0d8c0;
+      border: 2px solid #88a888;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+      image-rendering: pixelated;
+    }
+
+    #snakeCanvas {
+      background-color: #c0d8c0;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    #keypad {
+      display: grid;
+      gap: 10px;
+      width: 90%;
+      margin-top: 10px;
+    }
+
+    .nav-keys {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .nav-key {
+      background-color: #555;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      position: absolute;
+      font-size: 1.5em;
+      color: #eee;
+      box-shadow: 0 4px #333;
+      border: none;
+    }
+
+    .nav-key.up { top: -40px; left: 50%; transform: translateX(-50%); }
+    .nav-key.down { bottom: -40px; left: 50%; transform: translateX(-50%); }
+    .nav-key.left { left: 10px; top: 50%; transform: translateY(-50%); }
+    .nav-key.right { right: 10px; top: 50%; transform: translateY(-50%); }
+
+    .nav-key.center {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #333;
+      font-size: 1em;
+      position: static;
+      transform: none;
+      box-shadow: 0 4px #111;
+    }
+
+    #speaker {
+      width: 60px;
+      height: 8px;
+      background-color: #666;
+      border-radius: 4px;
+      margin-top: 15px;
+    }
+
+    #logout-btn {
+      margin-top: 10px;
+      padding: 8px 16px;
+      font-size: 0.5em;
+      font-family: 'Press Start 2P', cursive;
+      background-color: #555;
+      color: #eee;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #logout-btn:hover {
+      background: #333;
+    }
+
+    #copyright {
+      margin-top: 20px;
+      font-size: 0.5em;
+      color: #ddd;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="login-form">
+    <div style="color: #fff; margin-bottom: 10px;">Masukkan Nama Anda</div>
+    <input type="text" id="username" placeholder="Nama Anda">
+    <br>
+    <button id="login-btn">Login</button>
+  </div>
+
+  <div id="nokia-phone">
+    <div id="screen-bezel">
+      <div id="game-screen">
+        <canvas id="snakeCanvas" width="280" height="200"></canvas>
+      </div>
+    </div>
+    <div id="keypad">
+      <div class="nav-keys">
+        <button class="nav-key up" data-direction="UP">^</button>
+      </div>
+      <div class="nav-keys">
+        <button class="nav-key left" data-direction="LEFT"><</button>
+        <button class="nav-key center" data-direction="OK">OK</button>
+        <button class="nav-key right" data-direction="RIGHT">></button>
+      </div>
+      <div class="nav-keys">
+        <button class="nav-key down" data-direction="DOWN">v</button>
+      </div>
+    </div>
+    <div id="speaker"></div>
+    <button id="logout-btn">Logout</button>
+  </div>
+
+  <div id="copyright">© Rhefal Ditya XI-RPL</div>
+
+  <script>
+    let username = '';
+
+    document.getElementById('login-btn').addEventListener('click', function() {
+      const nameInput = document.getElementById('username').value.trim();
+      if (nameInput === '') {
+        Swal.fire('Nama wajib diisi!', '', 'warning');
+        return;
+      }
+      username = nameInput;
+      Swal.fire('Selamat datang, ' + username + '!', '', 'success').then(() => {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('nokia-phone').style.display = 'flex';
+        initializeGame();
+      });
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      Swal.fire({
+        title: 'Yakin logout?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Ya',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          location.reload();
+        }
+      });
+    });
+
+    let canvas, ctx;
+    let snake, food, direction, nextDirection;
+    let gameInterval;
+
+    function initializeGame() {
+      canvas = document.getElementById("snakeCanvas");
+      ctx = canvas.getContext("2d");
+      snake = [{ x: 10, y: 10 }];
+      food = { x: Math.floor(Math.random() * 28), y: Math.floor(Math.random() * 20) };
+      direction = 'RIGHT';
+      nextDirection = 'RIGHT';
+      if (gameInterval) clearInterval(gameInterval);
+      gameInterval = setInterval(gameLoop, 150);
+    }
+
+    function gameLoop() {
+      direction = nextDirection;
+      let head = { ...snake[0] };
+
+      switch (direction) {
+        case 'LEFT': head.x--; break;
+        case 'UP': head.y--; break;
+        case 'RIGHT': head.x++; break;
+        case 'DOWN': head.y++; break;
+      }
+
+      if (head.x < 0 || head.x >= 28 || head.y < 0 || head.y >= 20 || snake.some(s => s.x === head.x && s.y === head.y)) {
+        clearInterval(gameInterval);
+        Swal.fire('Game Over!', '', 'error').then(() => initializeGame());
+        return;
+      }
+
+      snake.unshift(head);
+
+      if (head.x === food.x && head.y === food.y) {
+        food = { x: Math.floor(Math.random() * 28), y: Math.floor(Math.random() * 20) };
+      } else {
+        snake.pop();
+      }
+
+      draw();
+    }
+
+    function draw() {
+      ctx.fillStyle = '#c0d8c0';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      snake.forEach((part, index) => {
+        ctx.fillStyle = index === 0 ? '#0a0' : '#0f0';
+        ctx.fillRect(part.x * 10, part.y * 10, 10, 10);
+        ctx.strokeStyle = '#060';
+        ctx.strokeRect(part.x * 10, part.y * 10, 10, 10);
+      });
+
+      ctx.fillStyle = '#f00';
+      ctx.fillRect(food.x * 10, food.y * 10, 10, 10);
+    }
+
+    document.querySelectorAll('.nav-key').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dir = btn.dataset.direction;
+        switch (dir) {
+          case 'UP': if (direction !== 'DOWN') nextDirection = 'UP'; break;
+          case 'DOWN': if (direction !== 'UP') nextDirection = 'DOWN'; break;
+          case 'LEFT': if (direction !== 'RIGHT') nextDirection = 'LEFT'; break;
+          case 'RIGHT': if (direction !== 'LEFT') nextDirection = 'RIGHT'; break;
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowUp': if (direction !== 'DOWN') nextDirection = 'UP'; break;
+        case 'ArrowDown': if (direction !== 'UP') nextDirection = 'DOWN'; break;
+        case 'ArrowLeft': if (direction !== 'RIGHT') nextDirection = 'LEFT'; break;
+        case 'ArrowRight': if (direction !== 'LEFT') nextDirection = 'RIGHT'; break;
+      }
+    });
+  </script>
+
+</body>
+</html>
